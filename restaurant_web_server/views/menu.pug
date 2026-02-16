@@ -1,0 +1,13 @@
+doctype html
+html 
+    head
+        meta(charset='UTF-8')
+        title Restaurant 
+    body
+        h1 Our Menu
+        ol
+            each item in menuItems
+                li
+                    strong= item.name
+                    |  #{item.description} 
+                    |  #{item.cost}

@@ -1,0 +1,18 @@
+doctype html 
+html
+    head
+        meta(charset="UTF-8")
+        title Restaurant 
+    body
+        h1 Our Hours 
+        div(style="display: flex; gap: 10px;")
+            each day of days
+                - const hoursObj = day in workingHours ? workingHours[day] : workingHours['default']
+                section(style="display: inline-flex; flex-direction: column; padding: 5px;")
+                    h2= day.toUpperCase()
+                    div 
+                        if hoursObj
+                            p Open: #{hoursObj.open}
+                            p Closed: #{hoursObj.closed}
+                        else
+                            p CLOSED
