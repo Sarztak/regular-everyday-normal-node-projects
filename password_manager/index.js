@@ -1,12 +1,17 @@
 import bcrypt from "bcrypt";
 import promptModule from "prompt-sync";
+import db from "./db.js";
 
 const prompt = promptModule();
-const mockDB = {passwords: {}};
 
 function saveNewPassword(password) {
     const hash = bcrypt.hashSync(password, 10);
-    mockDB.hash = hash;
+    const stmt = db.prepare(`
+        INSERT OR REPLACE INTO master (id, hash)
+        VALUES (1, ?)
+    `);
+
+    stmt.run(hash);
     console.log("Password has been saved!");
     showMenu();
 }
@@ -30,22 +35,29 @@ function showMenu() {
 }
 
 function viewPasswords() {
-    const { passwords } = mockDB;
-    Object.entries(passwords).forEach(([key, value], index) => {
-        console.log(`${index + 1}. ${key} => ${value}`);
+    const rows = db.prepare(`
+        select name, password from passwords`).all();
+    
+    rows.forEach((row, index) => {
+        console.log(`${index + 1}. ${row.name} => ${row.password}`);
     });
+
     showMenu();
 }
 function promptManageNewPassword() {
     const name = prompt("Enter name for password: ");
     const password = prompt("Enter password to save: ");
-    mockDB.passwords[name] = password;
+    const stmt = db.prepare(`
+        insert or replace into passwords (name, password)
+        values (?, ?)
+    `);
+    stmt.run(name, password);
     showMenu();
 }
 
 async function compareHashedPassword(password) {
-    const { hash } = mockDB;
-    return await bcrypt.compare(password, hash);
+    const row = db.prepare(`select hash from master where id = 1`).get();
+    return await bcrypt.compare(password, row.hash);
 }
 
 function promptNewPassword() {
@@ -65,5 +77,6 @@ async function promptOldPassword() {
     }
 }
 
-if (!mockDB.hash) promptNewPassword();
+const masterExists = db.prepare(`select hash from master where id = 1`).get()
+if (!masterExists) promptNewPassword();
 else promptOldPassword();
