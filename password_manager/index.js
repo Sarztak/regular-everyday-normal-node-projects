@@ -44,6 +44,7 @@ function viewPasswords() {
 
     showMenu();
 }
+
 function promptManageNewPassword() {
     const name = prompt("Enter name for password: ");
     const password = prompt("Enter password to save: ");
@@ -61,7 +62,7 @@ async function compareHashedPassword(password) {
 }
 
 function promptNewPassword() {
-    const response = prompt("Enter a master Password: ");
+    const response = prompt("Enter a master password: ");
     saveNewPassword(response)
 }
 
